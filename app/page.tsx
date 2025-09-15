@@ -1,10 +1,9 @@
-import { Button } from '@/components/ui/button'
+import MapContainer from '@/map/map-container'
 
 export default function Home() {
   return (
     <div className="">
-      Home
-      <Button>Click me</Button>
+      <MapContainer />
     </div>
   )
 }
