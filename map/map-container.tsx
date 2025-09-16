@@ -85,12 +85,11 @@ const MapInner = () => {
   }, [])
 
   return (
-    <div className="absolute overflow-hidden inset-0">
+    <div className="absolute overflow-hidden inset-0 w-screen h-screen bg-slate-900">
       {/* 지도 */}
       <Map
         ref={(e) => setMap && setMap(e || undefined)}
         initialViewState={{ longitude: 127, latitude: 35, zoom: 3 }}
-        style={{ width: '100%', height: '100%' }}
         mapStyle={customMapStyle}
       >
         <MapControls />
