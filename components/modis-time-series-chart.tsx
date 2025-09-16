@@ -11,16 +11,7 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 import { ChartLegend, ChartLegendContent } from '@/components/ui/chart'
-
-interface TimeSeriesData {
-  date: number
-  EVI: number
-  NDVI: number
-}
-
-interface TimeSeriesChartProps {
-  data: TimeSeriesData[]
-}
+import { useMapStore } from '@/store/map-store'
 
 const formatXAxis = (tickItem) => {
   const date = new Date(tickItem)
@@ -30,16 +21,18 @@ const formatXAxis = (tickItem) => {
   return month === 1 ? year.toString() : month.toString()
 }
 
-const ModisTimeSeriesChart = ({ data }: TimeSeriesChartProps) => {
+const ModisTimeSeriesChart = () => {
+  const { timeSeries } = useMapStore()
+
   // Keep original date for X-axis formatting
-  const formattedData = data.map((item) => ({
+  const formattedData = timeSeries.map((item) => ({
     ...item,
     date: item.date,
   }))
   console.log(formattedData)
 
   return (
-    <div className="w-[500px] h-80 p-4 bg-white rounded-lg shadow-lg">
+    <div className="w-[600px] h-80 p-4 bg-white rounded-lg shadow-lg">
       <h3 className="text-lg font-semibold mb-4">시간별 농작물 생장량 지수</h3>
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={formattedData}>
