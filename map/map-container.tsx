@@ -4,6 +4,7 @@ import MapContextProvider from '@/map/map-context-provider'
 import useMapContext from './use-map-context'
 import Map, { Layer, Source } from 'react-map-gl/maplibre'
 import MapControls from './map-controls'
+import ModisTimeSeriesChart from '@/components/modis-time-series-chart'
 import { useState, useEffect } from 'react'
 import { getTimeSeriesByRegion, ndvi } from '@/module/server'
 
@@ -94,6 +95,13 @@ const MapInner = () => {
           </Source>
         )}
       </Map>
+
+      {/* 시계열 차트 */}
+      {timeSeries.length > 0 && (
+        <div className="absolute bottom-4 right-4 z-10">
+          <ModisTimeSeriesChart data={timeSeries} />
+        </div>
+      )}
     </div>
   )
 }
