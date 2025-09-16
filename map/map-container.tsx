@@ -8,6 +8,31 @@ import ModisTimeSeriesChart from '@/components/modis-time-series-chart'
 import { useMapStore } from '@/store/map-store'
 import { useEffect } from 'react'
 import { getTimeSeriesByRegion, ndvi } from '@/module/server'
+import type { StyleSpecification } from 'maplibre-gl'
+
+const customMapStyle: StyleSpecification = {
+  version: 8,
+  name: 'Custom Globe Style',
+  projection: {
+    type: ['interpolate', ['exponential', 0.5], ['zoom'], 2, 'globe', 6, 'mercator'],
+  },
+  sources: {
+    satellite: {
+      type: 'raster',
+      tiles: [
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      ],
+      tileSize: 256,
+    },
+  },
+  layers: [
+    {
+      id: 'satellite-layer',
+      type: 'raster',
+      source: 'satellite',
+    },
+  ],
+}
 
 const MapInner = () => {
   const { setMap, map } = useMapContext()
@@ -66,8 +91,7 @@ const MapInner = () => {
         ref={(e) => setMap && setMap(e || undefined)}
         initialViewState={{ longitude: 127, latitude: 35, zoom: 3 }}
         style={{ width: '100%', height: '100%' }}
-        mapStyle="https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json"
-        projection="globe"
+        mapStyle={customMapStyle}
       >
         <MapControls />
         {/* 래스터 타일 */}
