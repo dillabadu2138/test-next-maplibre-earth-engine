@@ -20,12 +20,11 @@ export async function ndvi(body: {
   coordinates: number[][]
   visParams: VisObject
 }) {
-  // First, authenticate
   await authenticate()
 
   const { startYear, coordinates, visParams } = body
 
-  // Area of Interest
+  // Area of interest
   const aoi = ee.Geometry.Polygon(coordinates)
 
   const start_date = ee.Date(`${startYear}-01-01`)
@@ -57,4 +56,62 @@ export async function ndvi(body: {
   console.log(urlFormat)
 
   return { urlFormat }
+}
+
+// Get time series
+export async function getTimeSeriesByRegion(body: {
+  startYear: number
+  endYear: number
+  coordinates: number[][]
+  chartType?: string // Optional
+}) {
+  await authenticate()
+
+  // Destructure
+  const { startYear, endYear, coordinates, chartType } = body
+  const startDate = ee.Date(startYear + '-01-01')
+  const endDate = ee.Date(endYear + '-12-31')
+
+  // Area of interest
+  const aoi = ee.Geometry.Polygon(coordinates)
+
+  // Get MODIS collection
+  const modis_collection: ee.ImageCollection = ee
+    .ImageCollection('MODIS/006/MOD13Q1')
+    .filter(ee.Filter.date(startDate, endDate))
+
+  // Create time series data
+  const timeSeries = modis_collection.map(function (image) {
+    const date = image.get('system:time_start')
+    const stats = image.reduceRegion({
+      reducer: ee.Reducer.mean(),
+      geometry: aoi,
+      scale: 5000,
+    })
+
+    return ee.Feature(null, {
+      date: date,
+      EVI: stats.get('EVI'),
+      NDVI: stats.get('NDVI'),
+    })
+  })
+
+  // Convert to FeatureCollection
+  const timeSeriesFC = ee.FeatureCollection(timeSeries)
+
+  // Evaluate the time series data
+  const timeSeriesInfo = await new Promise((resolve, reject) => {
+    timeSeriesFC.getInfo((result, error) => {
+      if (error) reject(new Error(error))
+      else resolve(result)
+    })
+  })
+
+  return timeSeriesInfo
+
+  // Aggregating band values within the region
+
+  //   if (chartType == 'yearly') {
+  //   } else if (chartType == 'yearly') {
+  //   }
 }

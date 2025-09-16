@@ -5,14 +5,14 @@ import useMapContext from './use-map-context'
 import Map, { Layer, Source } from 'react-map-gl/maplibre'
 import MapControls from './map-controls'
 import { useState, useEffect } from 'react'
-import { ndvi } from '@/module/server'
-import ee from '@google/earthengine'
+import { getTimeSeriesByRegion, ndvi } from '@/module/server'
 
 const MapInner = () => {
   const { setMap, map } = useMapContext()
 
   // TODO: Global state management
   const [tile, setTile] = useState(null)
+  const [timeSeries, setTimeSeries] = useState([])
   const [startYear, setStartYear] = useState(2018)
   const [endYear, setEndYear] = useState(2023)
   const [visParams, setVisParams] = useState({
@@ -46,26 +46,39 @@ const MapInner = () => {
     [120.61733763183594, 33.94630141529378],
   ])
 
-  // Trigger server-side logic in response to client-side lifecycle events or state changes
-  useEffect(() => {
-    const loadTile = async () => {
-      try {
-        const { urlFormat } = await ndvi({ startYear, coordinates, visParams })
-        console.log('Tile URL:', urlFormat)
-        setTile([urlFormat])
-      } catch (error) {
-        console.error('Failed to load Landsat NDVI data:', error)
-      }
+  const loadLandsatTile = async () => {
+    try {
+      // Clear previous tile
+      setTile(null)
+      const { urlFormat } = await ndvi({ startYear, coordinates, visParams })
+      console.log('Tile URL:', urlFormat)
+      setTile([urlFormat])
+    } catch (error) {
+      console.error('Failed to load Landsat NDVI data:', error)
     }
+  }
 
-    // Only load if we don't already have a tile
-    if (!tile) {
-      loadTile()
+  const loadTimeSeriesByRegion = async () => {
+    try {
+      const timeSeriesData = await getTimeSeriesByRegion({ startYear, endYear, coordinates })
+      console.log('Time Series Data:', timeSeriesData)
+      const data = timeSeriesData['features'].map((e) => e.properties)
+      console.log(data)
+      setTimeSeries(data)
+    } catch (error) {
+      console.error('Failed to load MODIS time series data:', error)
     }
-  }, [tile, startYear, endYear, coordinates, visParams])
+  }
+
+  // Load initial tile
+  useEffect(() => {
+    loadLandsatTile()
+    loadTimeSeriesByRegion()
+  }, [])
 
   return (
     <div className="absolute overflow-hidden inset-0">
+      {/* 지도 */}
       <Map
         ref={(e) => setMap && setMap(e || undefined)}
         initialViewState={{ longitude: 127, latitude: 35, zoom: 3 }}
