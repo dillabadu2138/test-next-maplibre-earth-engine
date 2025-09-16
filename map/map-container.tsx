@@ -9,6 +9,7 @@ import { useMapStore } from '@/store/map-store'
 import { useEffect } from 'react'
 import { getTimeSeriesByRegion, ndvi } from '@/module/server'
 import type { StyleSpecification } from 'maplibre-gl'
+import ControlPanel from '@/components/control-panel'
 
 const customMapStyle: StyleSpecification = {
   version: 8,
@@ -46,12 +47,17 @@ const MapInner = () => {
     visParams,
     setTile,
     setTimeSeries,
+    setIsLoadingTile,
+    setIsLoadingTimeSeries,
     resetTile,
     resetTimeSeries,
   } = useMapStore()
 
   const loadLandsatTile = async () => {
     try {
+      // Set loading to true
+      setIsLoadingTile(true)
+
       // Clear previous tile
       resetTile()
 
@@ -59,12 +65,17 @@ const MapInner = () => {
       console.log('Tile URL:', urlFormat)
       setTile([urlFormat])
     } catch (error) {
-      console.error('Failed to load Landsat NDVI data:', error)
+      console.error('Failed to load Landsat NDVI tile data:', error)
+    } finally {
+      setIsLoadingTile(false)
     }
   }
 
-  const loadTimeSeriesByRegion = async () => {
+  const loadModisTimeSeriesByRegion = async () => {
     try {
+      // Set loading to true
+      setIsLoadingTimeSeries(true)
+
       // Clear previous time series
       resetTimeSeries()
 
@@ -75,14 +86,10 @@ const MapInner = () => {
       setTimeSeries(data)
     } catch (error) {
       console.error('Failed to load MODIS time series data:', error)
+    } finally {
+      setIsLoadingTimeSeries(false)
     }
   }
-
-  // Load initial tile
-  useEffect(() => {
-    loadLandsatTile()
-    loadTimeSeriesByRegion()
-  }, [])
 
   return (
     <div className="absolute overflow-hidden inset-0 w-screen h-screen bg-slate-900">
@@ -100,6 +107,16 @@ const MapInner = () => {
           </Source>
         )}
       </Map>
+
+      {/* 컨트롤 패널 */}
+      <div className="absolute top-4 left-4 pointer-events-auto">
+        <ControlPanel
+          onApply={() => {
+            loadLandsatTile()
+            loadModisTimeSeriesByRegion()
+          }}
+        />
+      </div>
 
       {/* 시계열 차트 */}
       {timeSeries.length > 0 && (

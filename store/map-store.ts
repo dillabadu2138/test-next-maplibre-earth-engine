@@ -20,6 +20,8 @@ interface MapState {
   endYear: number
   coordinates: number[][]
   visParams: VisParams
+  isLoadingTile: boolean
+  isLoadingTimeSeries: boolean
 
   setTile: (tile: string[] | null) => void
   setTimeSeries: (timeSeries: TimeSeriesData[]) => void
@@ -27,6 +29,8 @@ interface MapState {
   setEndYear: (endYear: number) => void
   setCoordinates: (coordinates: number[][]) => void
   setVisParams: (visParams: VisParams) => void
+  setIsLoadingTile: (loading: boolean) => void
+  setIsLoadingTimeSeries: (loading: boolean) => void
   resetTile: () => void
   resetTimeSeries: () => void
 }
@@ -38,6 +42,8 @@ export const useMapStore = create<MapState>()(
       timeSeries: [],
       startYear: 2018,
       endYear: 2023,
+      isLoadingTile: false,
+      isLoadingTimeSeries: false,
       coordinates: [
         [120.61733763183594, 33.94630141529378],
         [132.43862669433594, 33.94630141529378],
@@ -74,6 +80,8 @@ export const useMapStore = create<MapState>()(
       setEndYear: (endYear) => set({ endYear }),
       setCoordinates: (coordinates) => set({ coordinates }),
       setVisParams: (visParams) => set({ visParams }),
+      setIsLoadingTile: (loading) => set({ isLoadingTile: loading }),
+      setIsLoadingTimeSeries: (loading) => set({ isLoadingTimeSeries: loading }),
       // Reset
       resetTile: () => set({ tile: null }),
       resetTimeSeries: () => set({ timeSeries: [] }),
