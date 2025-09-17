@@ -85,7 +85,7 @@ export default function ControlPanel({ onApply }: ControlPanelProps) {
             {/* 차트 종류 선택 */}
             <div className="space-y-2">
               <Label className="text-md font-medium">분석 차트 종류 선택</Label>
-              <RadioGroup defaultValue="comfortable" className="flex gap-2">
+              <RadioGroup defaultValue="comfortable" className="flex gap-2" disabled>
                 <div className="flex items-center gap-2">
                   <RadioGroupItem value="timeSeries" id="r1" />
                   <Label htmlFor="r1">시계열</Label>

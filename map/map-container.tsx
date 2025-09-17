@@ -11,6 +11,7 @@ import { useEffect } from 'react'
 import { getTimeSeriesByRegion, ndvi } from '@/module/server'
 import type { StyleSpecification } from 'maplibre-gl'
 import ControlPanel from '@/components/control-panel'
+import LegendPanel from '@/components/legend-panel'
 
 const customMapStyle: StyleSpecification = {
   version: 8,
@@ -107,6 +108,22 @@ const MapInner = () => {
           <Source id="ndvi" type="raster" tiles={tile}>
             <Layer id="ndvi" type="raster" />
           </Source>
+        )}
+
+        {/* 범례 패널 */}
+        {tile && (
+          <div className="absolute top-5 left-1/2 -translate-x-1/2 bg-white p-4 rounded-lg">
+            <LegendPanel
+              title="식생지수(%)"
+              width={300}
+              height={60}
+              tickSize={10}
+              tickFormat=".2f"
+              minValue={visParams.min}
+              maxValue={visParams.max}
+              colorScheme={visParams.palette}
+            />
+          </div>
         )}
       </Map>
 
