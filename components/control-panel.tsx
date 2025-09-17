@@ -5,25 +5,19 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
   CardFooter,
   CardTitle,
 } from '@/components/ui/card'
-import { Menu, Square, Triangle, MapPin, Loader2 } from 'lucide-react'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Pentagon, MapPin, Loader2 } from 'lucide-react'
 import { useMapStore } from '@/store/map-store'
 
 interface ControlPanelProps {
   onApply: () => void
 }
-
-const years = [
-  2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015,
-  2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024,
-]
 
 export default function ControlPanel({ onApply }: ControlPanelProps) {
   const {
@@ -32,9 +26,11 @@ export default function ControlPanel({ onApply }: ControlPanelProps) {
     visParams,
     isLoadingTile,
     isLoadingTimeSeries,
+    drawingMode,
     setStartYear,
     setEndYear,
     setVisParams,
+    setDrawingMode,
   } = useMapStore()
 
   const isLoading = isLoadingTile || isLoadingTimeSeries
@@ -42,17 +38,17 @@ export default function ControlPanel({ onApply }: ControlPanelProps) {
     <Card className="bg-white shadow-lg">
       <CardHeader>
         <CardTitle>농작물 생산량 모니터링</CardTitle>
-        <CardDescription>전 세계의 농작물의 생육 상태를 시기별로 모니터링</CardDescription>
+        <CardDescription>전세계 농작물 생육 상태 모니터링</CardDescription>
       </CardHeader>
       <CardContent>
         <form>
           <div className="space-y-4">
             {/* 1. 조사 기간 선택 */}
             <div className="space-y-2">
-              <Label className="text-sm font-medium">1. 조사 기간 선택</Label>
-              <div className="flex items-center justify-between gap-2">
+              <Label className="text-md font-medium">조사 기간 선택</Label>
+              <div className="flex gap-2">
                 <div className="space-y-1">
-                  <Label className="text-xs">시작 년도</Label>
+                  <Label className="text-xs text-muted-foreground">시작년도</Label>
                   <Input
                     type="number"
                     value={startYear}
@@ -68,7 +64,7 @@ export default function ControlPanel({ onApply }: ControlPanelProps) {
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-xs">종료 년도</Label>
+                  <Label className="text-xs text-muted-foreground">종료년도</Label>
                   <Input
                     type="number"
                     value={endYear}
@@ -86,46 +82,64 @@ export default function ControlPanel({ onApply }: ControlPanelProps) {
               </div>
             </div>
 
-            {/* 2. 차트 종류 선택 */}
+            {/* 차트 종류 선택 */}
             <div className="space-y-2">
-              <Label className="text-sm font-medium">2. 차트 종류 선택</Label>
-              <RadioGroup defaultValue="comfortable">
-                <div className="flex items-center gap-3">
+              <Label className="text-md font-medium">분석 차트 종류 선택</Label>
+              <RadioGroup defaultValue="comfortable" className="flex gap-2">
+                <div className="flex items-center gap-2">
                   <RadioGroupItem value="timeSeries" id="r1" />
-                  <Label htmlFor="r1">시계열 분석</Label>
+                  <Label htmlFor="r1">시계열</Label>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   <RadioGroupItem value="yearly" id="r2" />
-                  <Label htmlFor="r2">연도별 분석</Label>
+                  <Label htmlFor="r2">연도별</Label>
                 </div>
               </RadioGroup>
             </div>
 
-            {/* 3. 그리기 도구 선택 */}
+            {/* 그리기 모드 선택 */}
             <div className="space-y-2">
-              <Label className="text-sm font-medium">3. 그리기 도구 선택</Label>
-              <div className="flex flex-col gap-2">
-                <Button variant="outline">
-                  <Square fill="currentColor" className="text-gray-600" />
-                  사각형
-                </Button>
-                <Button variant="outline">
-                  <Triangle fill="currentColor" className="text-red-800" />
+              <Label className="text-md font-medium">그리기 모드 선택</Label>
+              <p className="text-xs text-muted-foreground">
+                Esc 키로 그리기 모드에서 나갈 수 있습니다
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant={drawingMode === 'polygon' ? 'default' : 'outline'}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    setDrawingMode('polygon')
+                  }}
+                  disabled={isLoading}
+                >
+                  <Pentagon stroke="currentColor" className="text-green-600" />
                   다각형
                 </Button>
-                <Button variant="outline">
-                  <MapPin className="text-blue-500" />
+
+                <Button
+                  type="button"
+                  variant={drawingMode === 'point' ? 'default' : 'outline'}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    setDrawingMode('point')
+                  }}
+                  disabled={isLoading}
+                >
+                  <MapPin stroke="currentColor" className="text-yellow-600" />
                   포인트
                 </Button>
               </div>
             </div>
 
-            {/* 4. 범례 선택 */}
+            {/* 시각화 파라미터 조정 */}
             <div className="space-y-2">
-              <Label className="text-sm font-medium">4. 시각화 파라미터 조정</Label>
-              <div className="flex items-center justify-between gap-2">
+              <Label className="text-md font-medium">시각화 파라미터 조정</Label>
+              <div className="flex gap-2">
                 <div className="space-y-1">
-                  <Label className="text-xs">최솟값</Label>
+                  <Label className="text-xs text-muted-foreground">최솟값</Label>
                   <Input
                     id="minVal"
                     type="number"
@@ -137,11 +151,12 @@ export default function ControlPanel({ onApply }: ControlPanelProps) {
                       }
                     }}
                     step={0.1}
+                    min={0}
                     className="w-20"
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-xs">최댓값</Label>
+                  <Label className="text-xs text-muted-foreground">최댓값</Label>
                   <Input
                     id="maxVal"
                     type="number"
@@ -153,6 +168,8 @@ export default function ControlPanel({ onApply }: ControlPanelProps) {
                       }
                     }}
                     step={0.1}
+                    min={0.1}
+                    max={1}
                     className="w-20"
                   />
                 </div>

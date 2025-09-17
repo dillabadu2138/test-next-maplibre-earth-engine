@@ -5,6 +5,7 @@ import useMapContext from './use-map-context'
 import Map, { Layer, Source } from 'react-map-gl/maplibre'
 import MapControls from './map-controls'
 import ModisTimeSeriesChart from '@/components/modis-time-series-chart'
+import MapDrawControls from '@/components/map-draw-controls'
 import { useMapStore } from '@/store/map-store'
 import { useEffect } from 'react'
 import { getTimeSeriesByRegion, ndvi } from '@/module/server'
@@ -100,6 +101,7 @@ const MapInner = () => {
         mapStyle={customMapStyle}
       >
         <MapControls />
+        <MapDrawControls />
         {/* 래스터 타일 */}
         {tile && (
           <Source id="ndvi" type="raster" tiles={tile}>

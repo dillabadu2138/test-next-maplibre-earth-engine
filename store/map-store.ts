@@ -22,6 +22,7 @@ interface MapState {
   visParams: VisParams
   isLoadingTile: boolean
   isLoadingTimeSeries: boolean
+  drawingMode: 'none' | 'polygon' | 'point' | 'simple_select'
 
   setTile: (tile: string[] | null) => void
   setTimeSeries: (timeSeries: TimeSeriesData[]) => void
@@ -31,6 +32,7 @@ interface MapState {
   setVisParams: (visParams: VisParams) => void
   setIsLoadingTile: (loading: boolean) => void
   setIsLoadingTimeSeries: (loading: boolean) => void
+  setDrawingMode: (mode: 'none' | 'polygon' | 'point' | 'simple_select') => void
   resetTile: () => void
   resetTimeSeries: () => void
 }
@@ -44,13 +46,8 @@ export const useMapStore = create<MapState>()(
       endYear: 2023,
       isLoadingTile: false,
       isLoadingTimeSeries: false,
-      coordinates: [
-        [120.61733763183594, 33.94630141529378],
-        [132.43862669433594, 33.94630141529378],
-        [132.43862669433594, 43.26378821701301],
-        [120.61733763183594, 43.26378821701301],
-        [120.61733763183594, 33.94630141529378],
-      ],
+      drawingMode: 'none',
+      coordinates: [],
       visParams: {
         min: 0,
         max: 1,
@@ -82,6 +79,7 @@ export const useMapStore = create<MapState>()(
       setVisParams: (visParams) => set({ visParams }),
       setIsLoadingTile: (loading) => set({ isLoadingTile: loading }),
       setIsLoadingTimeSeries: (loading) => set({ isLoadingTimeSeries: loading }),
+      setDrawingMode: (mode) => set({ drawingMode: mode }),
       // Reset
       resetTile: () => set({ tile: null }),
       resetTimeSeries: () => set({ timeSeries: [] }),
