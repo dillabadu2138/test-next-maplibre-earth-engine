@@ -5,20 +5,22 @@ import {
   Area,
   XAxis,
   YAxis,
-  CartesianGrid,
   Tooltip,
   Legend,
   ResponsiveContainer,
+  CartesianGrid,
+  Label,
 } from 'recharts'
-import { ChartLegend, ChartLegendContent } from '@/components/ui/chart'
 import { useMapStore } from '@/store/map-store'
 
-const formatXAxis = (tickItem) => {
-  const date = new Date(tickItem)
-  const month = date.getMonth()
-  const year = date.getFullYear()
+const formatDate = (value) => {
+  const date = new Date(value)
 
-  return month === 1 ? year.toString() : month.toString()
+  return date.toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  })
 }
 
 const ModisTimeSeriesChart = () => {
@@ -36,14 +38,29 @@ const ModisTimeSeriesChart = () => {
       <h3 className="text-lg font-semibold mb-4">시간별 농작물 생장량 지수</h3>
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={formattedData}>
-          <XAxis dataKey="date" tickFormatter={formatXAxis} textAnchor="end" height={70} />
-          <YAxis />
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis
+            dataKey="date"
+            axisLine={false}
+            tick={{ fontSize: 10 }}
+            tickMargin={5}
+            minTickGap={32}
+            tickFormatter={formatDate}
+          >
+            <Label value="기간" position="insideBottom" fontSize={12} />
+          </XAxis>
+          <YAxis
+            tickFormatter={(value) => {
+              if (value >= 1000) return `${value / 1000}k`
+
+              return `${value}`
+            }}
+          >
+            <Label value="식생 지수[EVI]" angle={-90} position="insideLeft" fontSize={12} />
+          </YAxis>
           <Tooltip
-            labelFormatter={(value) => `Date: ${value}`}
-            formatter={(value: number, name: string) => [
-              value?.toFixed(3),
-              name === 'EVI' ? 'EVI' : 'NDVI',
-            ]}
+            labelFormatter={formatDate}
+            formatter={(value: number, name: string) => [value?.toFixed(3), name === 'EVI']}
           />
           <Legend />
           <Area
@@ -52,15 +69,7 @@ const ModisTimeSeriesChart = () => {
             stackId="1"
             stroke="var(--chart-3)"
             fill="var(--chart-3)"
-            fillOpacity={0.6}
-          />
-          <Area
-            type="natural"
-            dataKey="NDVI"
-            stackId="1"
-            stroke="var(--chart-3)"
-            fill="var(--chart-3)"
-            fillOpacity={0.4}
+            fillOpacity={0.5}
           />
         </AreaChart>
       </ResponsiveContainer>

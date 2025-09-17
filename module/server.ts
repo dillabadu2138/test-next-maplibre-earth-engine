@@ -92,7 +92,6 @@ export async function getTimeSeriesByRegion(body: {
     return ee.Feature(null, {
       date: date,
       EVI: stats.get('EVI'),
-      NDVI: stats.get('NDVI'),
     })
   })
 
