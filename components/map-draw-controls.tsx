@@ -191,7 +191,7 @@ const MapDrawControls = () => {
       console.log('MapBox Draw added to map successfully')
 
       // Event listeners for drawing completion
-      const onDrawCreate = (e: any) => {
+      const onDrawCreate = (e: { features: Array<{ geometry: { type: string; coordinates: number[][][] } }> }) => {
         const feature = e.features[0]
         if (feature && feature.geometry.type === 'Polygon') {
           // Convert polygon coordinates to our format
