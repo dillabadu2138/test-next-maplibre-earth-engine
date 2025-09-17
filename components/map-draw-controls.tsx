@@ -184,9 +184,9 @@ const MapDrawControls = () => {
       })
 
       drawRef.current = draw
-      // @ts-ignore - MapboxDraw is compatible with MapLibre IControl
 
       // Add Mapbox Draw to map
+      // @ts-expect-error - 무시
       map.addControl(draw)
       console.log('MapBox Draw added to map successfully')
 
@@ -216,7 +216,7 @@ const MapDrawControls = () => {
     return () => {
       if (map && drawRef.current) {
         try {
-          // @ts-ignore - MapboxDraw is compatible with MapLibre IControl
+          // @ts-expect-error - 무시
           map.removeControl(drawRef.current)
         } catch (error) {
           console.log('Error removing draw control:', error)
